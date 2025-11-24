@@ -1,0 +1,19 @@
+spring:
+
+  application:
+    name: study
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/study?serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ssafy
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: create
