@@ -1,6 +1,6 @@
 package com.backend.study.entity;
 
-import com.backend.study.dto.request.UserReq;
+import com.backend.study.dto.request.UserCreateReq;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,13 +27,12 @@ public class UserEntity {
     @Column(name = "user_name")
     private String userName;
 
+    public UserEntity createUser(UserCreateReq Req) {
+        UserEntity NewUser = new UserEntity();
+        NewUser.id = Req.getId();
+        NewUser.password = Req.getPassword();
+        NewUser.userName = Req.getUserName();
 
-    public UserEntity create(UserReq req){
-        UserEntity entity=new UserEntity();
-        entity.id= req.getId();
-        entity.password=req.getPassword();
-        entity.userName=req.getUserName();
-
-        return entity;
+        return NewUser;
     }
 }
