@@ -3,7 +3,7 @@ package com.backend.study.dto.response;
 import lombok.Data;
 
 @Data
-public class UserCreateRes {
+public class UserRes {
 
     private String id;
 

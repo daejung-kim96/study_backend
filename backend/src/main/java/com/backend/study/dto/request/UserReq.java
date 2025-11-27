@@ -4,7 +4,7 @@ package com.backend.study.dto.request;
 import lombok.Data;
 
 @Data
-public class UserCreateReq {
+public class UserReq {
 
     private String id;
 

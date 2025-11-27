@@ -1,20 +1,24 @@
 package com.backend.study.service;
 
-import com.backend.study.dto.request.UserCreateReq;
+import com.backend.study.dto.request.UserReq;
 import com.backend.study.entity.UserEntity;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public interface UserService {
 
     //생성
-    void createUser(UserCreateReq Req);
+    Long createUser(UserReq Req);
+
+    //조회
+    UserEntity getUser(Long userNo);
 
     //수정
     void updateUser(UserEntity userEntity);
 
     //삭제
-    void deleteUser(UserEntity userEntity);
+    void deleteUser(Long id);
 
-    //조회
-    UserEntity findUserById(Long id);
+
 
 }
