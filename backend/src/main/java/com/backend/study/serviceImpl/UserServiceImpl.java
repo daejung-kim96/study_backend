@@ -1,14 +1,19 @@
 package com.backend.study.serviceImpl;
 
-import com.backend.study.dto.request.UserReq;
+import com.backend.study.dto.request.UserRequest;
+import com.backend.study.dto.response.UserResponse;
 import com.backend.study.entity.UserEntity;
 import com.backend.study.repository.UserRepository;
 import com.backend.study.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -18,35 +23,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long createUser(UserReq Req) {
-        UserEntity NewUser = new UserEntity();
-        NewUser.createUser(Req);
+    public UserEntity createUser(UserRequest Req) {
+        UserEntity user = UserEntity.from(Req);
 
-        return NewUser.getUserNo();
+        UserEntity savedUser = userRepository.save(user);
+        log.info("created User : {} ", savedUser.getId());
+
+        return savedUser;
+
     }
 
     @Override
-    public UserEntity getUser(Long userNo) {
-        Optional<UserEntity> result = userRepository.findById(userNo);
+    public UserEntity getUser(Long id) {
 
-        return result.orElseThrow();
+        return userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with id : {}", id);
+                    return new RuntimeException("User not found with id : " + id);
+                });
     }
 
     @Override
-    public void updateUser(UserEntity userEntity) {
-        Optional<UserEntity> result = userRepository.findById(userEntity.getUserNo());
-
-        UserEntity user = result.orElseThrow();
-
-        user.changeId(userEntity.getId());
-        user.changePassword(userEntity.getPassword());
-
-        userRepository.save(user);
+    public List<UserEntity> getUsers() {
+        return userRepository.findAll();
     }
 
     @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    public UserEntity updateUser(Long id, UserRequest Req) {
+        UserEntity user = userRepository.findById(id).orElseThrow();
+
+        user.update(Req);
+        log.info(user.toString());
+
+        return user;
+
+    }
+
+    @Override
+    public void deleteUser(Long userNo) {
+        userRepository.deleteById(userNo);
     }
 
 }

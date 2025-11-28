@@ -1,25 +1,27 @@
 package com.backend.study.entity;
 
-import com.backend.study.dto.request.UserReq;
+import com.backend.study.dto.request.UserRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Table(name = "users")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_no")
-    private Long userNo;
+    @Column(name = "user_id")
+    private Long id;
 
-    @Column(name = "id")
-    private String id;
+    @Column(name = "login_id")
+    private String loginId;
 
     @Column(name = "password")
     private String password;
@@ -27,19 +29,18 @@ public class UserEntity {
     @Column(name = "user_name")
     private String userName;
 
-    public UserEntity createUser(UserReq Req) {
+    public static UserEntity from(UserRequest Req) {
         UserEntity NewUser = new UserEntity();
-        NewUser.id = Req.getId();
+        NewUser.loginId = Req.getLoginId();
         NewUser.password = Req.getPassword();
         NewUser.userName = Req.getUserName();
 
         return NewUser;
     }
 
-    public void changeId(String newId){
-        this.id = newId;
-    }
-    public void changePassword(String newPassword) {
-        this.password = newPassword;
+    public void update(UserRequest Req) {
+        this.loginId = Req.getLoginId();
+        this.password = Req.getPassword();
+        this.userName = Req.getUserName();
     }
 }
