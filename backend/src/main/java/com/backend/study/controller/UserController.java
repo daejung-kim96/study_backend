@@ -18,26 +18,31 @@ public class UserController {
 
     private final UserService userServiceImpl;
 
+    //조회
     @GetMapping("/{id}")
     public UserResponse getUser(@PathVariable("id") Long id){
         return UserResponse.from(userServiceImpl.getUser(id));
     }
 
+    //유저 전체조회
     @GetMapping("/all")
     public List<UserEntity> getUsers(){
         return userServiceImpl.getUsers();
     }
 
+    //유저 생성
     @PostMapping("/")
     public void createUser(@RequestBody UserRequest Req){
         userServiceImpl.createUser(Req);
     }
 
+    //유저 삭제
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable("id") Long id){
         userServiceImpl.deleteUser(id);
     }
 
+    //유저 업데이트
     @PutMapping("/{id}")
     public void updateUser(@PathVariable("id") Long id, @RequestBody UserRequest Req){
         UserResponse.from(userServiceImpl.updateUser(id, Req));

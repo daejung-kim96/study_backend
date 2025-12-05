@@ -1,14 +1,12 @@
 package com.backend.study.service;
 
 import com.backend.study.dto.request.UserRequest;
-import com.backend.study.dto.response.UserResponse;
 import com.backend.study.entity.UserEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
 public interface UserService {
 
     //생성
