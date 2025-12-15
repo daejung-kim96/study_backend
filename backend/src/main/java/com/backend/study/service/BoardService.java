@@ -3,10 +3,7 @@ package com.backend.study.service;
 
 import com.backend.study.dto.request.BoardCreateRequest;
 import com.backend.study.dto.request.BoardUpdateRequest;
-import com.backend.study.dto.request.UserRequest;
 import com.backend.study.entity.BoardEntity;
-import com.backend.study.entity.UserEntity;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
