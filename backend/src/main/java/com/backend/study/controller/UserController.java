@@ -1,6 +1,7 @@
 package com.backend.study.controller;
 
-import com.backend.study.dto.request.UserRequest;
+import com.backend.study.dto.request.SignupRequest;
+import com.backend.study.dto.request.UserUpdateRequest;
 import com.backend.study.dto.response.UserResponse;
 import com.backend.study.entity.UserEntity;
 import com.backend.study.service.UserService;
@@ -30,9 +31,9 @@ public class UserController {
         return userServiceImpl.getUsers();
     }
 
-    //유저 생성
-    @PostMapping("/")
-    public void createUser(@RequestBody UserRequest Req){
+    //유저 생성 -> 이거 원래 /였는데 헷갈려서 그냥 뺌
+    @PostMapping
+    public void createUser(@RequestBody SignupRequest Req){
         userServiceImpl.createUser(Req);
     }
 
@@ -44,8 +45,7 @@ public class UserController {
 
     //유저 업데이트
     @PutMapping("/{id}")
-    public void updateUser(@PathVariable("id") Long id, @RequestBody UserRequest Req){
-        UserResponse.from(userServiceImpl.updateUser(id, Req));
-
+    public void updateUser(@PathVariable("id") Long id, @RequestBody UserUpdateRequest req){
+        UserResponse.from(userServiceImpl.updateUser(id, req));
     }
 }

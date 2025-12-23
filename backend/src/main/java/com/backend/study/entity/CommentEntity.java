@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"board", "user"})
 @Table(name = "comments")
 @EntityListeners(AuditingEntityListener.class)
 public class CommentEntity {

@@ -1,6 +1,7 @@
 package com.backend.study.entity;
 
-import com.backend.study.dto.request.UserRequest;
+import com.backend.study.dto.request.SignupRequest;
+import com.backend.study.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Table(name = "users")
 public class UserEntity {
 
@@ -38,23 +38,25 @@ public class UserEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @ToString.Exclude
     private List<BoardEntity> boards = new ArrayList<>();
 
     // Setter 대신 쓰는 static 함수
-    public static UserEntity from(UserRequest Req) {
+    public static UserEntity from(SignupRequest Req) {
         UserEntity NewUser = new UserEntity();
         NewUser.loginId = Req.getLoginId();
-        NewUser.password = Req.getPassword();
+        // NewUser.password = Req.getPassword();  서비스에서 암호화 후 주입으로 변경
         NewUser.userName = Req.getUserName();
 
         return NewUser;
     }
 
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
     // 업데이트 함수
-    public void update(UserRequest Req) {
-        this.loginId = Req.getLoginId();
-        this.password = Req.getPassword();
-        this.userName = Req.getUserName();
+    public void update(UserUpdateRequest req) {
+        // this.password = Req.getPassword(); 얘도 마찬가지
+        this.userName = req.getUserName();
     }
 }

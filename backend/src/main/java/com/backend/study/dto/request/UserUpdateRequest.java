@@ -1,18 +1,12 @@
 package com.backend.study.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserRequest {
-
-    private String loginId;
-
-    private String password;
-
+@AllArgsConstructor
+public class UserUpdateRequest {
     private String userName;
-
 }
