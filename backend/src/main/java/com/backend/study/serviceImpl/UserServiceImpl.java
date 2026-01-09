@@ -2,6 +2,7 @@ package com.backend.study.serviceImpl;
 
 import com.backend.study.dto.request.SignupRequest;
 import com.backend.study.dto.request.UserUpdateRequest;
+import com.backend.study.entity.Role;
 import com.backend.study.entity.UserEntity;
 import com.backend.study.repository.UserRepository;
 import com.backend.study.service.UserService;
@@ -62,6 +63,23 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    // 2026. 1월 첫째주 추가 -> 권한 변경 메서드
+    @Override
+    @Transactional
+    public UserEntity changeUserRole(Long id, Role role) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("코런 유저는 없어용 : {}", id);
+                    return new RuntimeException("코런 유저는 없어용 : " + id);
+                });
+
+        user.changeRole(role);
+        log.info("changed role. userId={}, newRole={}", id, role);
+
+        return user;
+    }
+    
 
     //삭제
     @Transactional

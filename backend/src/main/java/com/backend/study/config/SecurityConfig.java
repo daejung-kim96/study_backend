@@ -86,6 +86,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users", "/api/users/").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/csrf").permitAll()
+                        
+                        // 2026. 1월 첫째주 추가 -> test/admin은 admin만 허용
+                        .requestMatchers("/test/admin").hasRole("ADMIN")
+
+                        // 얘는 권한변경 API -> ADMIN인 친구만 되게 했는데 우선은 풀어놔야할듯?
+                        
+                        // 어드민만
+                        //.requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        //로그인한 사람 전부 쓸 수 있게
+                        .requestMatchers("/api/admin/**").authenticated()
+
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

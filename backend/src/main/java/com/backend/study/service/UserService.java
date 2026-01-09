@@ -4,6 +4,8 @@ import com.backend.study.dto.request.SignupRequest;
 import com.backend.study.dto.request.UserUpdateRequest;
 import com.backend.study.entity.UserEntity;
 
+import com.backend.study.entity.Role;
+
 import java.util.List;
 
 public interface UserService {
@@ -18,6 +20,9 @@ public interface UserService {
 
     //수정
     UserEntity updateUser(Long id, UserUpdateRequest req);
+
+    //권한 수정
+    UserEntity changeUserRole(Long id, Role role);
 
     //삭제
     void deleteUser(Long id);
