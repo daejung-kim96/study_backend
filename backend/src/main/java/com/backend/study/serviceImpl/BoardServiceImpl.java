@@ -8,6 +8,8 @@ import com.backend.study.repository.BoardRepository;
 import com.backend.study.repository.UserRepository;
 import com.backend.study.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +27,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardEntity createBoard(BoardCreateRequest req) {
-        UserEntity user = userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("코런 유저는 없어용 id=" + req.getUserId()));
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserEntity user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("코런 유저는 없어용 loginId=" + loginId));
 
         BoardEntity board = BoardEntity.from(req, user);
         return boardRepository.save(board);
@@ -53,6 +57,13 @@ public class BoardServiceImpl implements BoardService {
         BoardEntity board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("코런 게시글은 없어용. id=" + id));
 
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 작성자만 허용
+        if (!board.getUser().getLoginId().equals(loginId)) {
+            throw new AccessDeniedException("작성자만 수정할 수 있어요.");
+        }
+
         board.changeTitleAndContent(req.getTitle(), req.getContent());
 
         return board;
@@ -64,6 +75,13 @@ public class BoardServiceImpl implements BoardService {
     public void deleteBoard(Long id) {
         BoardEntity board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("코런 게시글은 없어용. id=" + id));
+
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 작성자만 허용
+        if (!board.getUser().getLoginId().equals(loginId)) {
+            throw new AccessDeniedException("작성자만 삭제할 수 있어요.");
+        }
 
         boardRepository.delete(board);
     }

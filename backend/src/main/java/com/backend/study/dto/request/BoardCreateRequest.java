@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardCreateRequest {
-
-    private Long userId;
+    
+    //보안상 제거
+ // private Long userId;
 
     private String title;
 
