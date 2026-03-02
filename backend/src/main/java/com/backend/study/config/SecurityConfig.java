@@ -1,5 +1,6 @@
 package com.backend.study.config;
 
+import com.backend.study.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -27,82 +29,159 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+// 세션 기반
+
+//@Configuration
+//@EnableWebSecurity
+//public class SecurityConfig {
+//
+//    //패스워드 그거 뭐냐 시큐리티 정책때문에 인코더로 변경
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+//
+//    // 인증 매니징
+//    @Bean
+//    public AuthenticationProvider authenticationProvider(
+//            UserDetailsService userDetailsService,
+//            PasswordEncoder passwordEncoder
+//    ) {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+//
+//        provider.setPasswordEncoder(passwordEncoder);
+//
+//        return provider;
+//    }
+//
+//
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationProvider provider) {
+//        return new ProviderManager(provider);
+//    }
+//
+//
+//    @Bean
+//    public SecurityContextRepository securityContextRepository() {
+//        return new HttpSessionSecurityContextRepository();
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//
+//        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+//        CsrfTokenRequestAttributeHandler handler = new CsrfTokenRequestAttributeHandler();
+//
+//        http
+//                .cors(Customizer.withDefaults())
+//                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+//                .securityContext(sc -> sc.securityContextRepository(securityContextRepository()))
+//                .csrf(csrf -> csrf
+//                        .csrfTokenRepository(repo)
+//                        .csrfTokenRequestHandler(handler)
+//                        .ignoringRequestMatchers(request ->
+//                                request.getRequestURI().equals("/api/auth/login")
+//                                        || request.getRequestURI().equals("/api/auth/logout")
+//                                        || (request.getRequestURI().equals("/api/users") && "POST".equals(request.getMethod()))
+//                        )
+//                )
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/api/users", "/api/users/").permitAll()
+//                        .requestMatchers("/api/auth/**").permitAll()
+//                        .requestMatchers("/api/csrf").permitAll()
+//
+//                        // 2026. 1월 첫째주 추가 -> test/admin은 admin만 허용
+//                        .requestMatchers("/test/admin").hasRole("ADMIN")
+//
+//                        // 얘는 권한변경 API -> ADMIN인 친구만 되게 했는데 우선은 풀어놔야할듯?
+//
+//                        // 어드민만
+//                        //.requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        //로그인한 사람 전부 쓸 수 있게
+//                        .requestMatchers("/api/admin/**").authenticated()
+//
+//
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(AbstractHttpConfigurer::disable)
+//                .httpBasic(AbstractHttpConfigurer::disable)
+//                .logout(AbstractHttpConfigurer::disable);
+//
+//        return http.build();
+//    }
+//
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
+//
+//        config.setAllowedOriginPatterns(List.of(
+//                "http://localhost:5173"
+//        ));
+//        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS")); // 일단 다 열어놔
+//        config.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN", "X-Requested-With", "Authorization")); // csrf 헤더
+//        config.setAllowCredentials(true); // 쿠키 허용
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//        return source;
+//    }
+//}
+
+// 토큰 기반으로 변경
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //패스워드 그거 뭐냐 시큐리티 정책때문에 인코더로 변경
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 인증 매니징
     @Bean
     public AuthenticationProvider authenticationProvider(
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder
     ) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-
         provider.setPasswordEncoder(passwordEncoder);
-
         return provider;
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationProvider provider) {
         return new ProviderManager(provider);
     }
 
-
-    @Bean
-    public SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository();
-    }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        CsrfTokenRequestAttributeHandler handler = new CsrfTokenRequestAttributeHandler();
-
         http
                 .cors(Customizer.withDefaults())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .securityContext(sc -> sc.securityContextRepository(securityContextRepository()))
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(repo)
-                        .csrfTokenRequestHandler(handler)
-                        .ignoringRequestMatchers(request ->
-                                request.getRequestURI().equals("/api/auth/login")
-                                        || request.getRequestURI().equals("/api/auth/logout")
-                                        || (request.getRequestURI().equals("/api/users") && "POST".equals(request.getMethod()))
-                        )
-                )
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users", "/api/users/").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/csrf").permitAll()
-                        
-                        // 2026. 1월 첫째주 추가 -> test/admin은 admin만 허용
+                        .requestMatchers(HttpMethod.POST, "/api/users", "/api/users/").permitAll()
+
                         .requestMatchers("/test/admin").hasRole("ADMIN")
-
-                        // 얘는 권한변경 API -> ADMIN인 친구만 되게 했는데 우선은 풀어놔야할듯?
-                        
-                        // 어드민만
-                        //.requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        //로그인한 사람 전부 쓸 수 있게
                         .requestMatchers("/api/admin/**").authenticated()
-
 
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable);
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -111,12 +190,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:5173"
-        ));
-        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS")); // 일단 다 열어놔
-        config.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN", "X-Requested-With", "Authorization")); // csrf 헤더
-        config.setAllowCredentials(true); // 쿠키 허용
+        config.setAllowedOriginPatterns(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("Content-Type", "Authorization"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

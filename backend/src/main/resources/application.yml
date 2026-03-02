@@ -18,6 +18,11 @@ spring:
     hibernate:
       ddl-auto: create
 
+jwt:
+  secret: "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456"
+  access-expire-ms: 3600000
+
+
 logging:
   level:
     org.springframework.security: DEBUG
